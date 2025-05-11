@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>REDSOCIAL</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        body{
+            font-family: "montserrat", sans-serif;
+        }
+        .profile-img {
+            width: 35px;
+            height: 35px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .avatar-small {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .post-box {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .post-img {
+            flex: 1 1 50%;
+            background-size: cover;
+            background-position: center;
+            min-height: 400px;
+        }
+        .post-content {
+            flex: 1 1 50%;
+            padding: 20px;
+        }
+        .comment-box {
+            margin-top: 20px;
+        }
+        .icon-bar i {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .comment-input {
+            border-radius: 20px;
+            padding-left: 15px;
+        }
+        .publicarcomentario{
+            padding: 12px;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <!-- nav -->
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm px-4">
+        <a class="navbar-brand fw-bold" href="index.html">REDSOCIAL</a>
+        <form class="d-flex mx-3 flex-grow-1">
+            <input class="form-control me-2" type="search" placeholder="Buscar..." aria-label="Buscar">
+        </form>
+        <div class="navbar-nav ms-auto d-flex align-items-center">
+            <a class="nav-link" href="#">Home</a>
+            <a class="nav-link" href="#">Postear</a>
+            <div class="nav-item dropdown">
+                <a class="nav-link d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">Cuenta <img src="https://via.placeholder.com/40" class="profile-img ms-2"></a>
+            </div>
+        </div>
+    </nav>
+    <!-- main -->
+    <div class="post-box bg-white">
+        <div class="post-img" style="background-image: url('https://images.pexels.com/photos/14681329/pexels-photo-14681329.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');"></div>
+        <div class="post-content">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="icon-bar">
+                    <i class="bi bi-heart"></i><span>1</span>
+                    <i class="bi bi-share"></i>
+                </div>
+                <button class="btn btn-dark btn-sm" id="showFormGuardar">Guardar</button>
+            </div>
+            <h6 class="mb-1">vanessa_contrerasR</h6>
+            <p class="text-muted">#museo #egipto #redsocial</p>
+            <div class="comment-box">
+                <label for="comment" class="form-label fw-bold">Deja un comentario</label>
+                <div class="comment-list" id="commentList"></div>
+                <div class="input-group">
+                    <input type="text" class="form-control comment-input" placeholder="Agrega un comentario..." disabled>
+                    <button class="btn btn-outline-secondary" id="showFormFlecha">
+                        <i class="bi bi-arrow-right-circle-fill"></i>
+                    </button>
+                </div>
+                <!-- formulario-comentario -->
+                <div class="card publicarcomentario mt-4 d-none" id="commentFormCard">
+                    <form id="commentForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="username" placeholder="Escribe tu usuario" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userComment" class="form-label">Comentario</label>
+                            <textarea class="form-control" id="userComment" rows="3" placeholder="Escribe tu comentario" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="avatar" class="form-label">Subir Avatar</label>
+                            <input type="file" class="form-control" id="avatar" accept="image/*">
+                        </div>
+                        <div class="enviar">
+                            <button type="submit" class="btn btn-dark">Publicar comentario</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $("#showFormGuardar, #showFormFlecha").on("click", function (){
+            $("#commentFormCard").removeClass("d-none");
+        });
+
+        $("#commentForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const username = $("#username").val().trim;
+            const comment = $("#userComment").val().trim;
+            const avatarFile = $("#avatar")[0].files[0];
+
+            if (username && comment){
+                if (avatarFile){
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        insertComment(username, comment, event.target.result);
+                    };
+                    reader.readAsDataURL(avatarFile);
+                } else {
+                    insertComment(username, comment, null);
+                }
+                this.reset();
+                $("#commentFormCard").addClass("d-none");
+            }
+        });
+
+        function insertComment(name, text, avatarUrl) {
+            const avatar = avatarUrl
+            ? `<img src="${avatarUrl}" class="avatar-small">`
+            : `<div class="avatar-small bg-secondary text-white text-center d-flex align-items-center justify-content-center rounded-circle" style="width:30px;height:30px;">${name.charAt(0).toUpperCase()}</div>`;
+            const html = `
+            <div class="d-flex align-items-center mb-2">
+                ${avatar}
+            <div>
+                <strong>${name}</strong><br>
+                <span>${text}</span>
+            </div>
+        </div>`;
+        $("#commentList").append(html);
+        }
+    </script>
+    
+
+</body>
+</html>
